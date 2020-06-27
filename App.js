@@ -20,6 +20,8 @@ export default class App extends React.Component {
   render() {
     const { newToDo, loadedToDos, toDos } = this.state;
     console.log(toDos);
+    console.log(Object.values(toDos).map(a => a.text));
+    
     if (!loadedToDos) {
       return <AppLoading />;
     }
@@ -37,10 +39,13 @@ export default class App extends React.Component {
             returnKeyType={"done"}
             autoCorrect={false}
             onSubmitEditing={this._addToDo}
+            underlineColorAndroid={"transparent"}
           ></TextInput>
           <ScrollView contentContainerStyle={styles.toDos}>
             {Object.values(toDos)
-            .map(toDo => 
+            .sort((a,b) =>
+            a.createdAt - b.createdAt)
+            .reverse().map(toDo => 
             <ToDo key={toDo.id}  
             deleteToDo={this._deleteToDo}
             uncompletedToDo={this._uncompletedToDo}
@@ -61,11 +66,11 @@ export default class App extends React.Component {
   _loadToDos = async() => {
     try{
       const toDos = await AsyncStorage.getItem("toDos");
-      console.log(toDos);
+      console.log("loadToTos " + toDos);
       const parsedToDos = JSON.parse(toDos);
       this.setState({
         loadedToDos: true,
-        toDos: parsedToDos
+        toDos: parsedToDos || {}
       })
     } catch(err){
       console.log(err);
